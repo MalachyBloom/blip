@@ -31,8 +31,8 @@ class LISA(LISAdata, Bayes):
 
         ## Calculate the antenna patterns
         if self.params['modeltype'] == 'isgwb':
-            self.rs1, self.rs2, self.rs3 = self.lisa_orbits(self.timearray)
-            self.R1, self.R2, self.R3 = self.tdi_isgwb_response(self.f0, self.ti, self.rs1, self.rs2, self.rs3)
+            #self.rs1, self.rs2, self.rs3 = self.lisa_orbits(self.timearray)
+            self.R1, self.R2, self.R3 = self.tdi_isgwb_response(self.f0)#, self.ti, self.rs1, self.rs2, self.rs3)
         elif params['modeltype']=='sph_sgwb':
             self.R1, self.R2, self.R3 = self.tdi_aniso_sph_sgwb_response(self.f0)
         else:
@@ -82,8 +82,8 @@ class LISA(LISAdata, Bayes):
         
         self.r1, self.r2, self.r3 = r1/(4*self.f0.reshape(self.f0.size, 1)), r2/(4*self.f0.reshape(self.f0.size, 1)), r3/(4*self.f0.reshape(self.f0.size, 1))
         
-        self.timearray = timearray
-        self.ti = 6000
+        #self.timearray = timearray
+        #self.ti = 6000
 
     
     def diag_spectra(self):
@@ -175,8 +175,8 @@ class LISA(LISAdata, Bayes):
         plt.ylabel('Power Spectrum 1/Hz')
         plt.legend()
         plt.savefig(self.params['out_dir'] + '/psdA.png', dpi=125)
-        import pdb; pdb.set_trace()
-        plt.close()
+        #import pdb; pdb.set_trace()
+        #plt.close()
         
 
 

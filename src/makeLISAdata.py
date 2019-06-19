@@ -1,12 +1,13 @@
 from __future__ import division
 import numpy as np
 import scipy.signal as sg
-from src.movingfreqDomain import movingfreqDomain
+from src.freqDomain import freqDomain
+#from src.movingfreqDomain import movingfreqDomain
 from scipy.interpolate import interp1d as intrp
 import os
 
-
-class LISAdata(movingfreqDomain):
+class LISAdata(freqDomain):
+#class LISAdata(movingfreqDomain):
 
     '''
     Class for lisa data. Includes methods for generation of gaussian instrumental noise, and generation 

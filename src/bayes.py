@@ -416,3 +416,49 @@ class Bayes():
 
     
         return Loglike
+
+    def orbiting_isgwb_only_log_likelihood(self, theta):
+
+        '''
+        Calculate likelihood for an isotropic stochastic background analysis.
+        
+
+        Parameters
+        -----------
+
+        theta   : float
+            A list or numpy array containing rescaled samples from the unit cube. The elementes are interpreted as samples for alpha, omega_ref, Np and Na respectively. 
+
+        Returns
+        ---------
+
+        Loglike   :   float
+            The log-likelihood value at the sampled point in the parameter space
+        '''
+
+
+        # unpack priors
+        alpha, log_omega0  = theta 
+
+        ## Signal PSD
+        H0 = 2.2*10**(-18)
+        Omegaf = 10**(log_omega0)*(self.fdata/self.params['fref'])**alpha
+
+        # Spectrum of the SGWB
+        Sgw = Omegaf*(3/(4*self.fdata**3))*(H0/np.pi)**2
+
+        # Spectrum of the SGWB signal as seen in LISA data, ie convoluted with the
+        # detector response tensor.
+        SA = Sgw*self.R1
+        SE = Sgw*self.R2
+        ST = Sgw*self.R3
+
+        SA = SA.T
+        SE = SE.T
+        ST = ST.T
+
+        Loglike  = - 0.5*np.sum( (np.abs(self.r1)**2)/SA + (np.abs(self.r2)**2)/SE + (np.abs(self.r3)**2)/ST + \
+             np.log(2*np.pi*SA) + np.log(2*np.pi*SE) + np.log(2*np.pi*ST)  )
+
+    
+        return Loglike

@@ -134,6 +134,8 @@ class LISA(LISAdata, Bayes):
                 self.R1, self.R2, self.R3 = self.asgwb_aet_response(self.f0)
             elif self.params['modeltype'] == 'noise_only':
                 print('Noise only model chosen ...')
+            elif self.params['modeltype'] == 'isgwb_signal_only' and self.params['tdi_lev']=='aet':
+                self.R1, self.R2, self.R3 = self.isgwb_aet_response(self.f0)
             else:       
                raise ValueError('Unknown recovery model selected')
                
@@ -147,6 +149,9 @@ class LISA(LISAdata, Bayes):
                 elif self.params['modeltype'] == 'isgwb' and self.params['tdi_lev']=='aet':
                     print("Loading previously calculated AET detector responses...")
                     self.R1, self.R2, self.R3 = np.loadtxt('R1arrayAET.txt'), np.loadtxt('R2arrayAET.txt'), np.loadtxt('R3arrayAET.txt')
+                elif self.params['modeltype'] == 'isgwb_signal_only' and self.params['tdi_lev']=='aet':
+                    print("Loading previously calculated AET detector responses...")
+                    self.R1, self.R2, self.R3 = np.loadtxt('R1arrayAET.txt'), np.loadtxt('R2arrayAET.txt'), np.loadtxt('R3arrayAET.txt')
                 elif self.params['modeltype'] == 'isgwb' and self.params['tdi_lev']=='xyz':
                     print("Loading previously calculated XYZ detector responses...")
                     self.R1, self.R2, self.R3 = np.loadtxt('R1arrayXYZ.txt'), np.loadtxt('R2arrayXYZ.txt'), np.loadtxt('R3arrayXYZ.txt')
@@ -156,6 +161,9 @@ class LISA(LISAdata, Bayes):
                 else:
                     raise ValueError('Unknown recovery model selected')
             elif self.params['modeltype'] == 'isgwb' and self.params['tdi_lev']=='aet':
+                self.rs1, self.rs2, self.rs3 = self.lisa_orbits(self.tsegmid)
+                self.R1, self.R2, self.R3 = self.orbiting_isgwb_aet_response(self.f0, self.tsegmid, self.rs1, self.rs2, self.rs3)
+            elif self.params['modeltype'] == 'isgwb_signal_only' and self.params['tdi_lev']=='aet':
                 self.rs1, self.rs2, self.rs3 = self.lisa_orbits(self.tsegmid)
                 self.R1, self.R2, self.R3 = self.orbiting_isgwb_aet_response(self.f0, self.tsegmid, self.rs1, self.rs2, self.rs3)
             elif self.params['modeltype'] == 'isgwb' and self.params['tdi_lev']=='xyz':
@@ -390,7 +398,14 @@ def blip(paramsfile='params.ini'):
             npar = len(parameters)     
             engine = NestedSampler(lisa.isgwb_log_likelihood, lisa.isgwb_prior,\
                      npar, bound='multi', sample='rwalk', nlive=nlive, rstate = randst)
-    
+        
+        elif params['modeltype']=='isgwb_signal_only':
+            print "Doing a ISGWB signal-only analysis ..."
+            parameters = [r'$\alpha$', r'$\log_{10} (\Omega_0)$']
+            npar = len(parameters)     
+            engine = NestedSampler(lisa.isgwb_only_log_likelihood,  lisa.isgwb_prior,\
+                     npar, bound='multi', sample='rwalk', nlive=nlive, rstate = randst)
+        
         elif params['modeltype']=='sph_sgwb':
     
             print "Doing a spherical harmonic stochastic analysis ..."
@@ -427,7 +442,14 @@ def blip(paramsfile='params.ini'):
             npar = len(parameters)     
             engine = NestedSampler(lisa.orbiting_isgwb_log_likelihood, lisa.isgwb_prior,\
                      npar, bound='multi', sample='rwalk', nlive=nlive, rstate = randst)
-    
+
+        elif params['modeltype']=='isgwb_signal_only':
+            print "Doing an orbiting ISGWB signal-only analysis ..."
+            parameters = [r'$\alpha$', r'$\log_{10} (\Omega_0)$']
+            npar = len(parameters)     
+            engine = NestedSampler(lisa.orbiting_isgwb_only_log_likelihood,  lisa.isgwb_prior,\
+                     npar, bound='multi', sample='rwalk', nlive=nlive, rstate = randst)
+        
         elif params['modeltype']=='sph_sgwb':
     
             print "Doing a spherical harmonic stochastic analysis ..."
@@ -454,6 +476,8 @@ def blip(paramsfile='params.ini'):
                      npar, bound='multi', sample='rwalk', nlive=nlive, rstate = randst)
     
         else:
+            import pdb
+            pdb.set_trace()
             raise ValueError('Unknown recovery model selected')
 
     print "npar = " + str(npar)

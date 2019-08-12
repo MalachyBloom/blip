@@ -8,6 +8,7 @@ R2array*
 R3array*
 Storage*
 mldc_tdi_withnoise*
+MLDCsegment*
 SGWB_withnoise*
 noiseless_mldc*
 WSL*

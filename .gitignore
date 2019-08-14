@@ -14,3 +14,5 @@ noiseless_mldc*
 WSL*
 cython_response.c
 cython_response.html
+cython_response.o
+cython_response.so

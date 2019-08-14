@@ -134,7 +134,7 @@ class LISA(LISAdata, Bayes):
                 self.R1, self.R2, self.R3 = self.asgwb_aet_response(self.f0)
             elif self.params['modeltype'] == 'noise_only':
                 print('Noise only model chosen ...')
-            elif self.params['modeltype'] == 'isgwb_signal_only' and self.params['tdi_lev']=='aet':
+            elif (self.params['modeltype'] == 'isgwb_fixed_noise' or self.params['modeltype']=='isgwb_fixed_signal') and self.params['tdi_lev']=='aet':
                 self.R1, self.R2, self.R3 = self.isgwb_aet_response(self.f0)
             else:       
                raise ValueError('Unknown recovery model selected')
@@ -149,7 +149,7 @@ class LISA(LISAdata, Bayes):
                 elif self.params['modeltype'] == 'isgwb' and self.params['tdi_lev']=='aet':
                     print("Loading previously calculated AET detector responses...")
                     self.R1, self.R2, self.R3 = np.loadtxt('R1arrayAET.txt'), np.loadtxt('R2arrayAET.txt'), np.loadtxt('R3arrayAET.txt')
-                elif self.params['modeltype'] == 'isgwb_signal_only' and self.params['tdi_lev']=='aet':
+                elif (self.params['modeltype'] == 'isgwb_fixed_noise' or self.params['modeltype']=='isgwb_fixed_signal') and self.params['tdi_lev']=='aet':
                     print("Loading previously calculated AET detector responses...")
                     self.R1, self.R2, self.R3 = np.loadtxt('R1arrayAET.txt'), np.loadtxt('R2arrayAET.txt'), np.loadtxt('R3arrayAET.txt')
                 elif self.params['modeltype'] == 'isgwb' and self.params['tdi_lev']=='xyz':
@@ -163,7 +163,7 @@ class LISA(LISAdata, Bayes):
             elif self.params['modeltype'] == 'isgwb' and self.params['tdi_lev']=='aet':
                 self.rs1, self.rs2, self.rs3 = self.lisa_orbits(self.tsegmid)
                 self.R1, self.R2, self.R3 = self.orbiting_isgwb_aet_response(self.f0, self.tsegmid, self.rs1, self.rs2, self.rs3)
-            elif self.params['modeltype'] == 'isgwb_signal_only' and self.params['tdi_lev']=='aet':
+            elif (self.params['modeltype'] == 'isgwb_fixed_noise' or self.params['modeltype']=='isgwb_fixed_signal') and self.params['tdi_lev']=='aet':
                 self.rs1, self.rs2, self.rs3 = self.lisa_orbits(self.tsegmid)
                 self.R1, self.R2, self.R3 = self.orbiting_isgwb_aet_response(self.f0, self.tsegmid, self.rs1, self.rs2, self.rs3)
             elif self.params['modeltype'] == 'isgwb' and self.params['tdi_lev']=='xyz':
@@ -403,7 +403,7 @@ def blip(paramsfile='params.ini'):
             print "Doing a ISGWB signal-only analysis ..."
             parameters = [r'$\alpha$', r'$\log_{10} (\Omega_0)$']
             npar = len(parameters)     
-            engine = NestedSampler(lisa.isgwb_only_log_likelihood,  lisa.isgwb_prior,\
+            engine = NestedSampler(lisa.isgwb_only_log_likelihood,  lisa.isgwb_only_prior,\
                      npar, bound='multi', sample='rwalk', nlive=nlive, rstate = randst)
         
         elif params['modeltype']=='sph_sgwb':
@@ -429,6 +429,20 @@ def blip(paramsfile='params.ini'):
             parameters = [r'$\log_{10} (Np)$', r'$\log_{10} (Na)$']
             npar = len(parameters)     
             engine = NestedSampler(lisa.instr_log_likelihood,  lisa.instr_prior,\
+                     npar, bound='multi', sample='rwalk', nlive=nlive, rstate = randst)
+ 
+        elif params['modeltype']=='isgwb_fixed_noise':
+            print "Doing an ISGWB fixed-noise analysis ..."
+            parameters = [r'$\alpha$', r'$\log_{10} (\Omega_0)$']
+            npar = len(parameters)     
+            engine = NestedSampler(lisa.fixed_noise_isgwb_log_likelihood,  lisa.isgwb_only_prior,\
+                     npar, bound='multi', sample='rwalk', nlive=nlive, rstate = randst)
+            
+        elif params['modeltype']=='isgwb_fixed_signal':
+            print "Doing an ISGWB fixed-signal analysis..."
+            parameters = [r'$\log_{10} (Np)$', r'$\log_{10} (Na)$']
+            npar = len(parameters)     
+            engine = NestedSampler(lisa.fixed_signal_isgwb_log_likelihood,  lisa.instr_prior,\
                      npar, bound='multi', sample='rwalk', nlive=nlive, rstate = randst)
     
         else:
@@ -442,13 +456,6 @@ def blip(paramsfile='params.ini'):
             npar = len(parameters)     
             engine = NestedSampler(lisa.orbiting_isgwb_log_likelihood, lisa.isgwb_prior,\
                      npar, bound='multi', sample='rwalk', nlive=nlive, rstate = randst)
-
-        elif params['modeltype']=='isgwb_signal_only':
-            print "Doing an orbiting ISGWB signal-only analysis ..."
-            parameters = [r'$\alpha$', r'$\log_{10} (\Omega_0)$']
-            npar = len(parameters)     
-            engine = NestedSampler(lisa.orbiting_isgwb_only_log_likelihood,  lisa.isgwb_prior,\
-                     npar, bound='multi', sample='rwalk', nlive=nlive, rstate = randst)
         
         elif params['modeltype']=='sph_sgwb':
     
@@ -473,6 +480,21 @@ def blip(paramsfile='params.ini'):
             parameters = [r'$\log_{10} (Np)$', r'$\log_{10} (Na)$']
             npar = len(parameters)     
             engine = NestedSampler(lisa.instr_log_likelihood,  lisa.instr_prior,\
+                     npar, bound='multi', sample='rwalk', nlive=nlive, rstate = randst)
+        
+        
+        elif params['modeltype']=='isgwb_fixed_noise':
+            print "Doing an orbiting ISGWB fixed-noise analysis ..."
+            parameters = [r'$\alpha$', r'$\log_{10} (\Omega_0)$']
+            npar = len(parameters)     
+            engine = NestedSampler(lisa.orbiting_fixed_noise_isgwb_log_likelihood,  lisa.isgwb_only_prior,\
+                     npar, bound='multi', sample='rwalk', nlive=nlive, rstate = randst)
+        
+        elif params['modeltype']=='isgwb_fixed_signal':
+            print "Doing an orbiting fixed-signal analysis..."
+            parameters = [r'$\log_{10} (Np)$', r'$\log_{10} (Na)$']
+            npar = len(parameters)     
+            engine = NestedSampler(lisa.orbiting_fixed_signal_isgwb_log_likelihood,  lisa.instr_prior,\
                      npar, bound='multi', sample='rwalk', nlive=nlive, rstate = randst)
     
         else:

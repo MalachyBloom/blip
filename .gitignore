@@ -21,3 +21,8 @@ eogtest*
 bayesfactorplot*
 test*
 vectest*
+/Analysis
+/data_files
+TODO*
+*.swp
+/misc

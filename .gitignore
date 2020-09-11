@@ -1,3 +1,5 @@
+*.pbs
+*.out
 *.pyc
 *.png
 *.pdf

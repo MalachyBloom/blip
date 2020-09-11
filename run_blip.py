@@ -7,7 +7,7 @@ from tools.plotmaker import plotmaker
 import matplotlib.pyplot as plt
 # from eogtest import open_img
 from src.dynesty_engine import dynesty_engine
-from src.emcee_engine import emcee_engine
+# from src.emcee_engine import emcee_engine
 
 class LISA(LISAdata, likelihoods):
 

@@ -1,0 +1,10 @@
+#!/bin/bash -l
+#PBS -l walltime=90:00:00,nodes=1:ppn=8,mem=80gb
+#PBS -m abe
+#PBS -M kuan0020@umn.edu
+#PBS -e error.lisa
+#PBS -o out.lisa
+source /home/vuk/kuan0020/research/lisaenv/bin/activate
+cd /home/vuk/kuan0020/research/lisaenv/blip
+time python3 run_blip.py params.ini
+deactivate

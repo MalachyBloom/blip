@@ -549,7 +549,7 @@ class LISAdata(geometry, instrNoise):
         ## the charecteristic frequency of LISA, and the scaled frequency array
         fstar = 3e8/(2*np.pi*self.armlength)
         f0 = frange/(2*fstar)
-
+        
         ## Response matrix : shape (3 x 3 x freq x time) if isotropic
         response_mat = self.add_astro_signal(f0, tmids)
         
@@ -622,6 +622,8 @@ class LISAdata(geometry, instrNoise):
 
         tarr =  np.arange(0, self.params['dur'], 1.0/self.params['fs'])
 
+        # import pdb; pdb.set_trace()
+        
         return h1, h2, h3, tarr
         
     def add_sgwb_data_tshift(self, fs=0.25, dur=1e5):
@@ -839,6 +841,8 @@ class LISAdata(geometry, instrNoise):
         # "Cut" to desired frequencies
         idx = np.logical_and(fftfreqs >=  self.params['fmin'] , fftfreqs <=  self.params['fmax'])
 
+        # import pdb; pdb.set_trace()w
+        
         # Output arrays
         fdata = fftfreqs[idx]
 

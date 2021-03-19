@@ -575,5 +575,10 @@ class geometry(sph_geometry):
         aet_response_mat = np.array([ [RAA, RAE, RAT] , \
                                     [np.conj(RAE), REE, RET], \
                                     [np.conj(RAT), np.conj(RET), RTT] ])
-
+        
+        # save aet_response_mat to a file
+        
+        # import pdb; pdb.set_trace()
+        # np.save('aet_resp_mat.npy', aet_response_mat)
+        
         return aet_response_mat

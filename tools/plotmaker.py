@@ -52,10 +52,10 @@ def plotmaker(params,parameters, inj):
         
         truevals.append(inj['log_Np'])
         truevals.append(inj['log_Na'])
-        truevals.append(inj['nHat'])
+        truevals.append(inj['wHat'])
         
         if len(parameters) == 4:
-            truevals.append(inj['wHat'])
+            truevals.append(inj['nHat'])
     
     elif params['modeltype']=='sph_sgwb':
 

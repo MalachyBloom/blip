@@ -93,16 +93,18 @@ class Bayes():
 
     def primo_prior(self, theta):
         
-        log_Np, log_Na, nHat = theta
+        # log_Np, log_Na, nHat = theta
         ## Setting wHat as a parameter too
         # log_Np, log_Na, nHat, wHat = theta
-        # wHat = 2*wHat - 0.33
-        nHat = 2*nHat 
+        log_Np, log_Na, wHat, nHat = theta
+        wHat = 1*wHat + 0.55
+        nHat = 1*nHat + 0.22 
         log_Np = -5*log_Np - 39
         log_Na = -5*log_Na - 46
         
         # return (log_Np, log_Na, nHat, wHat)
-        return (log_Np, log_Na, nHat)
+        return (log_Np, log_Na, wHat, nHat)
+        # return (log_Np, log_Na, nHat)
         
     def sph_prior(self, theta):
 
@@ -284,9 +286,9 @@ class Bayes():
         # Modelled Noise PSD
         cov_noise = self.instr_noise_spectrum(self.fdata,self.f0, Np, Na)
 
-        ## repeat C_Noise to have the same time-dimension as everything else
+        ## repeat C_Noise to have the same time-dimension as everything else (noise power spectrum)
         cov_noise = np.repeat(cov_noise[:, :, :, np.newaxis], self.tsegmid.size, axis=3)
-
+        
         ## Signal PSD
         H0 = 2.2*10**(-18)
         Omegaf = 10**(log_omega0)*(self.fdata/self.params['fref'])**alpha
@@ -384,10 +386,11 @@ class Bayes():
         
         ## Setting wHat as a parameter too
         # log_Np, log_Na, nHat, wHat = theta
-        log_Np, log_Na, nHat = theta
+        log_Np, log_Na, wHat, nHat = theta
+        # log_Np, log_Na, nHat = theta
         
         ## Comment this if wHat is a parameter too
-        wHat = self.inj['wHat']
+        # wHat = self.inj['wHat']
         ##
         
         Np, Na = 10**(log_Np), 10**(log_Na)
@@ -439,7 +442,6 @@ class Bayes():
         return loglike
 
 def bespoke_inv(A):
-
 
     """
     compute inverse without division by det; ...xv3xc3 input, or array of matrices assumed

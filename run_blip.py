@@ -228,7 +228,7 @@ class LISA(LISAdata, Bayes):
         C_noise = self.instr_noise_spectrum(self.fdata, self.f0, Np, Na)
 
         # Extract noise auto-power
-        S1, S2, S3 = C_noise[0, 0, :], C_noise[1, 1, :], C_noise[2, 2, :]
+        S1, S2, S3 = C_noise[0, 0, :], C_noise[1, 1, :], C_noise[2, 2, :] 
 
         if self.params['modeltype'] != 'noise_only':
 
@@ -298,7 +298,7 @@ class LISA(LISAdata, Bayes):
         plt.xlabel('f in Hz')
         plt.ylabel('Power Spectrum ')
         plt.legend()
-        plt.ylim([1e-46, 5e-40])
+        # plt.ylim([1e-46, 5e-40])
         plt.grid()
         plt.xlim(0.5*self.params['fmin'], 2*self.params['fmax'])
 
@@ -473,7 +473,8 @@ def blip(paramsfile='params.ini'):
         print("Doing primordial stochastic analysis ...")
         ## Setting wHat as a parameter too
         # parameters = [r'$\log_{10} (Np)$', r'$\log_{10} (Na)$', r'$\hat{n}$', r'$\hat{w}$']
-        parameters = [r'$\log_{10} (Np)$', r'$\log_{10} (Na)$', r'$\hat{n}$']
+        parameters = [r'$\log_{10} (Np)$', r'$\log_{10} (Na)$', r'$\hat{w}$', r'$\hat{n}$']
+        # parameters = [r'$\log_{10} (Np)$', r'$\log_{10} (Na)$', r'$\hat{n}$']
         npar = len(parameters)
         engine = NestedSampler(lisa.primo_log_likelihood, lisa.primo_prior, npar, bound='multi', sample='rwalk', nlive=nlive, rstate=randst)
 

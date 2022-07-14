@@ -12,7 +12,7 @@ import healpy as hp
 # from eogtest import open_img
 from src.dynesty_engine import dynesty_engine
 #from src.emcee_engine import emcee_engine
-#fhgkhgfkjf
+
 class LISA(LISAdata, likelihoods):
 
     '''

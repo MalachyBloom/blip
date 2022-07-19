@@ -102,6 +102,29 @@ def quickMapmaker(params, sample, parameters, inj, nside, saveto=None):
 
     return Omega_median_map 
 
+def fracOfMax(skymap,frac):
+    count = 0
+    for pxl in skymap:
+        if float(pxl) >= frac * max(skymap):
+            count += 1
+    return count/len(skymap)  
+
+def FWxM(skymap,x,ns):
+    peak_index = list(skymap).index(max(skymap))
+    signalBlob = {peak_index}
+    border = set(hp.pixelfunc.get_all_neighbours(ns,peak_index))
+    count = 0
+    full = False
+    while not full:
+        full = True
+        for pxl_index in list(border):
+            if skymap[pxl_index] > x*max(skymap):
+                signalBlob = signalBlob.union({pxl_index})
+                border = border.union(set(hp.pixelfunc.get_all_neighbours(ns,pxl_index))).difference(signalBlob)
+                count+=1
+                full = False       
+    return count/len(skymap)
+
 def sumNeighborsFracOfInj(skymap,inj_max,frac,ns):
     peak = list(skymap).index(max(skymap))
     signalBlob = {peak}
@@ -123,22 +146,24 @@ def sumNeighborsFracOfInj(skymap,inj_max,frac,ns):
 def getPointSize(params, sample, parameters, inj):
     nside=32
     Omega_median_map = quickMapmaker(params, sample, parameters, inj, nside)
-    pointSize = sumNeighborsFracOfInj(Omega_median_map,np.sum(Omega_median_map),.75,nside) 
+    # pointSize = fracOfMax(Omega_median_map,.5)
+    # pointSize = sumNeighborsFracOfInj(Omega_median_map,np.sum(Omega_median_map),.75,nside)
+    pointSize = FWxM(Omega_median_map, .5, nside)
     return pointSize
 
-def getInterval(lst, confidence):
-    lowToHigh = np.sort(lst)
-    highToLow = np.sort(lst)[::-1]
-    quantile = (1-confidence)/2
-    for i in range(len(lowToHigh)):
-        if i+1 >= quantile*len(lowToHigh):
-            lowerBound = lowToHigh[i]
-            break
-    for i in range(len(highToLow)):
-        if i+1 >= quantile*len(highToLow):
-            upperBound = highToLow[i]
-            break
-    return [lowerBound,upperBound]
+# def getInterval(lst, confidence):
+#     lowToHigh = np.sort(lst)
+#     highToLow = np.sort(lst)[::-1]
+#     quantile = (1-confidence)/2
+#     for i in range(len(lowToHigh)):
+#         if i+1 >= quantile*len(lowToHigh):
+#             lowerBound = lowToHigh[i]
+#             break
+#     for i in range(len(highToLow)):
+#         if i+1 >= quantile*len(highToLow):
+#             upperBound = highToLow[i]
+#             break
+#     return [lowerBound,upperBound]
 
 def getAreas(run):
     params, post, parameters, inj = draw(run)
@@ -150,6 +175,7 @@ def getAreas(run):
     areas=[]
     count=0
     r=0
+    print("There are " ,len(post)," samples for this run")
     for sample in post:
         A = getPointSize(params, sample, parameters, inj)
         areas.append(A)
@@ -157,21 +183,25 @@ def getAreas(run):
             print(str(int(r*100+.1)) + '%')
             r+=.01
         count+=1
+        # if 0.21 <= A <= 0.215:
+        #     print(sample)
+
     print('100%')
 
-    condidence68 = getInterval(areas, .68)
-    condidence90 = getInterval(areas, .9)
-    condidence95 = getInterval(areas, .95)
-    with open('/mnt/c/Users/malac/Stochastic_LISA/storage/error_bars/'+ run + '.txt','w') as f:
+    confidence68 = [np.quantile(areas, .16),np.quantile(areas, .84)]
+    confidence90 = [np.quantile(areas, .05),np.quantile(areas, .95)] 
+    confidence95 = [np.quantile(areas, .025),np.quantile(areas, .975)]
+
+    with open('/mnt/c/Users/malac/Stochastic_LISA/storage/error_bars/FWxM_e-1_'+ run + '.txt','w') as f:
         f.write("median: " + str(medianPointSize) +  '\n')
         f.write("mean: " + str(meanPointSize) +  '\n')
-        f.write("68'%' confidence interval: " + str(condidence68) +  '\n')
-        f.write("90'%' confidence interval: " + str(condidence90) + '\n')
-        f.write("95'%' confidence interval: " + str(condidence95) + '\n')
+        f.write("68'%' confidence interval: " + str(confidence68) +  '\n')
+        f.write("90'%' confidence interval: " + str(confidence90) + '\n')
+        f.write("95'%' confidence interval: " + str(confidence95) + '\n')
         f.write(str(areas))
 
 def main():
-    run = "3mo_2_2e-7"
+    run = "3mo_6_2e-7"
     getAreas(run)
 
 if __name__ == '__main__':

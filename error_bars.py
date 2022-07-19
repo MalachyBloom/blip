@@ -110,15 +110,16 @@ def fracOfMax(skymap,frac):
     return count/len(skymap)  
 
 def FWxM(skymap,x,ns):
-    peak_index = list(skymap).index(max(skymap))
+    peak_value = max(skymap)
+    peak_index = list(skymap).index(peak_value)
     signalBlob = {peak_index}
     border = set(hp.pixelfunc.get_all_neighbours(ns,peak_index))
     count = 0
     full = False
     while not full:
         full = True
-        for pxl_index in list(border):
-            if skymap[pxl_index] > x*max(skymap):
+        for pxl_index in border:
+            if skymap[pxl_index] > x*peak_value:
                 signalBlob = signalBlob.union({pxl_index})
                 border = border.union(set(hp.pixelfunc.get_all_neighbours(ns,pxl_index))).difference(signalBlob)
                 count+=1
@@ -151,20 +152,6 @@ def getPointSize(params, sample, parameters, inj):
     pointSize = FWxM(Omega_median_map, .5, nside)
     return pointSize
 
-# def getInterval(lst, confidence):
-#     lowToHigh = np.sort(lst)
-#     highToLow = np.sort(lst)[::-1]
-#     quantile = (1-confidence)/2
-#     for i in range(len(lowToHigh)):
-#         if i+1 >= quantile*len(lowToHigh):
-#             lowerBound = lowToHigh[i]
-#             break
-#     for i in range(len(highToLow)):
-#         if i+1 >= quantile*len(highToLow):
-#             upperBound = highToLow[i]
-#             break
-#     return [lowerBound,upperBound]
-
 def getAreas(run):
     params, post, parameters, inj = draw(run)
 
@@ -192,7 +179,7 @@ def getAreas(run):
     confidence90 = [np.quantile(areas, .05),np.quantile(areas, .95)] 
     confidence95 = [np.quantile(areas, .025),np.quantile(areas, .975)]
 
-    with open('/mnt/c/Users/malac/Stochastic_LISA/storage/error_bars/FWxM_e-1_'+ run + '.txt','w') as f:
+    with open('/mnt/c/Users/malac/Stochastic_LISA/storage/error_bars/FWxM_5e-1_'+ run + '.txt','w') as f:
         f.write("median: " + str(medianPointSize) +  '\n')
         f.write("mean: " + str(meanPointSize) +  '\n')
         f.write("68'%' confidence interval: " + str(confidence68) +  '\n')
@@ -201,7 +188,7 @@ def getAreas(run):
         f.write(str(areas))
 
 def main():
-    run = "3mo_6_2e-7"
+    run = "3mo_2_2e-7"
     getAreas(run)
 
 if __name__ == '__main__':

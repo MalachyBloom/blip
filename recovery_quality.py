@@ -100,14 +100,7 @@ def quickMapmaker(params, sample, parameters, inj, nside, saveto=None):
 
     Omega_median_map  =  Omega_1mHz_median * (1.0/norm) * (hp.alm2map(blm_median_vals, nside))**2
 
-    return Omega_median_map 
-
-def fracOfMax(skymap,frac):
-    count = 0
-    for pxl in skymap:
-        if float(pxl) >= frac * max(skymap):
-            count += 1
-    return count/len(skymap)  
+    return Omega_median_map  
 
 def FWxM(skymap,x,ns):
     peak_value = max(skymap)
@@ -124,72 +117,79 @@ def FWxM(skymap,x,ns):
                 border = border.union(set(hp.pixelfunc.get_all_neighbours(ns,pxl_index))).difference(signalBlob)
                 count+=1
                 full = False       
-    return count/len(skymap)
+    return signalBlob, peak_value
 
-def sumNeighborsFracOfInj(skymap,inj_max,frac,ns):
-    peak = list(skymap).index(max(skymap))
-    signalBlob = {peak}
-    border = set(hp.pixelfunc.get_all_neighbours(ns,peak))
-    count = 0
-    Sum = 0
-    while Sum <= frac*inj_max:
-        maxVal = 0
-        for pxl in list(border):
-            if skymap[pxl] > maxVal:
-                maxVal = skymap[pxl]
-                maxIndex = pxl
-        signalBlob = signalBlob.union({maxIndex})
-        border = border.union(set(hp.pixelfunc.get_all_neighbours(ns,maxIndex))).difference(signalBlob)
-        count += 1
-        Sum += maxVal
-    return count/len(skymap)
+def delete_multiple_element(list_object, indices):
+    indices = sorted(indices, reverse=True)
+    for idx in indices:
+        if idx < len(list_object):
+            list_object.pop(idx)
+    return list_object
 
-def getPointSize(params, sample, parameters, inj):
+def getSignalBlob(Omega_median_map):
     nside=32
-    Omega_median_map = quickMapmaker(params, sample, parameters, inj, nside)
     # pointSize = fracOfMax(Omega_median_map,.5)
     # pointSize = sumNeighborsFracOfInj(Omega_median_map,np.sum(Omega_median_map),.75,nside)
-    pointSize = FWxM(Omega_median_map, .5, nside)
-    return pointSize
+    signalBlob, peak_val = FWxM(Omega_median_map, .5, nside)
+    return signalBlob, peak_val
 
-def getAreas(run):
+def getMapStatus(params, sample, parameters, inj):
+    skymap = list(quickMapmaker(params, sample, parameters, inj, 32))
+    signalBlob, peak_val = getSignalBlob(skymap)
+
+    condition_1 = True
+    for pxl_val in delete_multiple_element(skymap,list(signalBlob)):
+        if pxl_val > .5*peak_val:
+            condition_1 = False
+            break
+    
+    condition_2 = False
+    if hp.pixelfunc.ang2pix(32,1.5708, -1.5708) in signalBlob:
+        condition_2 = True
+
+    if condition_1 and condition_2:
+        return True
+    else:
+        return False
+
+def getQuality(run):
     params, post, parameters, inj = draw(run)
 
-    medianPointSize = getPointSize(params, np.median(post, axis=0), parameters, inj)
-    meanPointSize = getPointSize(params, np.average(post, axis=0), parameters, inj)
+    medianStatus = getMapStatus(params, np.median(post, axis=0), parameters, inj)
+    meanStatus = getMapStatus(params, np.average(post, axis=0), parameters, inj)
+    print(medianStatus)
 
     random.shuffle(post)
-    areas=[]
-    count=0
-    r=0
+
+    count,good,r=0,0,0
     print("There are " ,len(post)," samples for this run")
     for sample in post:
-        A = getPointSize(params, sample, parameters, inj)
-        areas.append(A)
+        if getMapStatus(params, sample, parameters, inj):
+            good+=1
+
         if count <= r*len(post) < count+1:
             print(str(int(r*100+.1)) + '%')
             r+=.01
         count+=1
+
+    recovery_quality = good/len(post)
         # if 0.017 <= A <= 0.018:
         #     print(sample)
 
     print('100%')
+    print(recovery_quality)
 
-    confidence68 = [np.quantile(areas, .16),np.quantile(areas, .84)]
-    confidence90 = [np.quantile(areas, .05),np.quantile(areas, .95)] 
-    confidence95 = [np.quantile(areas, .025),np.quantile(areas, .975)]
-
-    with open('/mnt/c/Users/malac/Stochastic_LISA/storage/error_bars/FWxM_5e-1_'+ run + '.txt','w') as f:
-        f.write("median: " + str(medianPointSize) +  '\n')
-        f.write("mean: " + str(meanPointSize) +  '\n')
-        f.write("68'%' confidence interval: " + str(confidence68) +  '\n')
-        f.write("90'%' confidence interval: " + str(confidence90) + '\n')
-        f.write("95'%' confidence interval: " + str(confidence95) + '\n')
-        f.write(str(areas))
+    with open('/mnt/c/Users/malac/Stochastic_LISA/storage/recovery_quality/FWxM_5e-1_'+ run + '.txt','w') as f:
+        f.write("median: " + str(medianStatus) +  '\n')
+        f.write("mean: " + str(meanStatus) +  '\n')
+        f.write(str(recovery_quality))
 
 def main():
-    run = "3mo_8_2e-7"
-    getAreas(run)
+    runs = ['6mo_2_5e-8','6mo_2_6e-8','3mo_4_7e-8']
+    for run in runs:
+        print()
+        print(run)
+        getQuality(run)
 
 if __name__ == '__main__':
     main()

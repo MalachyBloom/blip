@@ -102,10 +102,10 @@ def quickMapmaker(params, sample, parameters, inj, nside, saveto=None):
 
     return Omega_median_map 
 
-def fracOfMax(skymap,frac):
+def fracOfMax(skymap,x):
     count = 0
     for pxl in skymap:
-        if float(pxl) >= frac * max(skymap):
+        if float(pxl) >= x * max(skymap):
             count += 1
     return count/len(skymap)  
 
@@ -180,16 +180,21 @@ def getAreas(run):
     confidence95 = [np.quantile(areas, .025),np.quantile(areas, .975)]
 
     with open('/mnt/c/Users/malac/Stochastic_LISA/storage/error_bars/FWxM_5e-1_'+ run + '.txt','w') as f:
-        f.write("median: " + str(medianPointSize) +  '\n')
-        f.write("mean: " + str(meanPointSize) +  '\n')
+        f.write("b_lm median: " + str(medianPointSize) +  '\n')
+        f.write("b_lm mean: " + str(meanPointSize) +  '\n')
+        f.write("distribution median: " + str(np.median(areas)) +  '\n')
+        f.write("distribution mean: " + str(np.mean(areas)) +  '\n')
         f.write("68'%' confidence interval: " + str(confidence68) +  '\n')
         f.write("90'%' confidence interval: " + str(confidence90) + '\n')
         f.write("95'%' confidence interval: " + str(confidence95) + '\n')
         f.write(str(areas))
 
 def main():
-    run = "3mo_8_2e-7"
-    getAreas(run)
+    runs = ['3mo_2_5e-6','3mo_2_4e-6','3mo_2_3e-6','3mo_2_2e-6','3mo_2_1e-6','3mo_4_5e-6','3mo_4_4e-6','3mo_4_3e-6','3mo_4_2e-6','3mo_4_1e-6','6mo_2_5e-6','6mo_2_4e-6','6mo_2_3e-6','12mo_2_5e-6','12mo_2_4e-6','12mo_2_3e-6']
+    for run in runs:
+        print()
+        print(run)
+        getAreas(run)  
 
 if __name__ == '__main__':
     main()

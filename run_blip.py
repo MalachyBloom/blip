@@ -207,6 +207,9 @@ class LISA(LISAdata, likelihoods):
         elif self.inj['injtype']=='point_source' and self.params['tdi_lev']=='xyz':
 #            self.add_astro_signal = self.ps_xyz_response
             self.add_astro_signal = self.asgwb_xyz_response
+        elif self.inj['injtype']=='two_point_source' and self.params['tdi_lev']=='michelson':
+#            self.add_astro_signal = self.ps_mich_response
+            self.add_astro_signal = self.asgwb_mich_response
         elif self.inj['injtype']=='dwd_fg' and self.params['tdi_lev']=='michelson':
             self.add_astro_signal = self.asgwb_mich_response
         elif self.inj['injtype']=='dwd_fg' and self.params['tdi_lev']=='aet':
@@ -474,7 +477,7 @@ class LISA(LISAdata, likelihoods):
         if self.params['modeltype'] == 'noise_only':
             Sx = C_noise[ii, jj, :]
         elif self.params['modeltype'] == 'sph_sgwb':
-            if self.inj['injtype'] == 'point_source':
+            if self.inj['injtype'] == 'point_source' or self.inj['injtype'] == 'two_point_source':
                 Sx = C_noise[ii, jj, :, None] + Sgw[:,None]*summ_response_mat[ii, jj, :, 0]
             else:
                 Sx = C_noise[ii, jj, :] + Sgw*summ_response_mat[ii, jj, :, 0]
@@ -550,6 +553,21 @@ class LISA(LISAdata, likelihoods):
                 
                 H0 = 2.2*10**(-18)
                 Sgwmap[ps_id] = np.sqrt(Omega_1mHz*(3/(4*(1e-3)**3))*(H0/np.pi)**2)
+                blms_inj = hp.sphtfunc.map2alm(Sgwmap,lmax=self.blmax)
+                self.alms_inj = self.blm_2_alm(blms_inj)
+            if self.inj['injtype'] == 'two_point_source':
+                npix = hp.nside2npix(10)
+                Sgwmap = np.zeros(npix)
+                
+                # identify the pixel with the point source
+                ps_id_1 = hp.ang2pix(10, self.inj['theta_1'], self.inj['phi_1'])
+                ps_id_2 = hp.ang2pix(10, self.inj['theta_2'], self.inj['phi_2'])
+
+                Omega_1mHz = 10**(self.inj['ln_omega0']) * (1e-3/25)**(self.inj['alpha'])
+                
+                H0 = 2.2*10**(-18)
+                Sgwmap[ps_id_1] = np.sqrt(Omega_1mHz*(3/(4*(1e-3)**3))*(H0/np.pi)**2)
+                Sgwmap[ps_id_2] = np.sqrt(Omega_1mHz*(3/(4*(1e-3)**3))*(H0/np.pi)**2)
                 blms_inj = hp.sphtfunc.map2alm(Sgwmap,lmax=self.blmax)
                 self.alms_inj = self.blm_2_alm(blms_inj)
 

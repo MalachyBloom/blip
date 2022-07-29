@@ -643,6 +643,49 @@ class LISAdata(geometry, sph_geometry, instrNoise, populations):
                     ## response matrix summed over Ylms
                     summ_response_mat = np.einsum('ijklm,m', response_mat, self.alms_inj)
 
+            elif self.inj['injtype'] == 'two_point_source':
+
+                if ii == 0:
+                    npix = hp.nside2npix(10)
+                    omegamap = np.zeros(npix)
+                    
+                    # identify the pixel with the point source
+                    ps_id_1 = hp.ang2pix(10, self.inj['theta_1'], self.inj['phi_1'])
+                    ps_id_2 = hp.ang2pix(10, self.inj['theta_2'], self.inj['phi_2'])
+    
+                    Omega_1mHz = 10**(self.inj['ln_omega0']) * (1e-3/self.params['fref'])**(self.inj['alpha'])
+    
+                    omegamap[ps_id_1] = Omega_1mHz
+                    omegamap[ps_id_2] = Omega_1mHz
+    
+                    hp.graticule()
+                    hp.mollview(omegamap, title='Injected angular distribution map $\Omega (f = 1 mHz)$')
+    
+                    plt.savefig(self.params['out_dir'] + '/inj_skymap.png', dpi=150)
+                    print('saving injected skymap at ' +  self.params['out_dir'] + '/inj_skymap.png')
+                    plt.close()
+                    
+                    
+                    ## need to set up a few things before doing the spherical harmonic inj
+                    ## build skymap
+                    Sgwmap = np.zeros(npix)
+                    
+                    H0 = 2.2*10**(-18)
+                    Sgwmap[ps_id_1] = np.sqrt(Omega_1mHz*(3/(4*(1e-3)**3))*(H0/np.pi)**2)
+                    Sgwmap[ps_id_2] = np.sqrt(Omega_1mHz*(3/(4*(1e-3)**3))*(H0/np.pi)**2)
+                    blms_inj = hp.sphtfunc.map2alm(Sgwmap,lmax=self.blmax)
+                    blms_inj = blms_inj/(blms_inj[0]* np.sqrt(4*np.pi))
+                    alms_inj = self.blm_2_alm(blms_inj)
+                    self.alms_inj = alms_inj/(alms_inj[0] * np.sqrt(4*np.pi))
+
+                    ## extrct only the non-negative components
+                    alms_non_neg = self.alms_inj[0:hp.Alm.getsize(self.almax)]
+
+                    Omega_1mHz = 10**(self.inj['ln_omega0']) * (1e-3/25)**(self.inj['alpha'])
+
+                    ## response matrix summed over Ylms
+                    summ_response_mat = np.einsum('ijklm,m', response_mat, self.alms_inj)
+                    
 #                    # converts alm_inj into a healpix max to be plotted and saved
 #                    # Plot with twice the analysis nside for better resolution
 #                    skymap_inj = hp.alm2map(alms_non_neg, 2*self.params['nside'])

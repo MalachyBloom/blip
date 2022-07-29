@@ -725,8 +725,8 @@ def blip(paramsfile='params.ini',resume=False):
     elif inj['injtype'] == 'two_point_source':
         inj['theta_1'] = float(config.get("inj", "theta_1"))
         inj['phi_1'] = float(config.get("inj", "phi_1"))
-        inj['theta_1'] = float(config.get("inj", "theta_1"))
-        inj['phi_1'] = float(config.get("inj", "phi_1"))
+        inj['theta_2'] = float(config.get("inj", "theta_2"))
+        inj['phi_2'] = float(config.get("inj", "phi_2"))
 
     # some run parameters
     params['out_dir']            = str(config.get("run_params", "out_dir"))

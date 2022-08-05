@@ -13,7 +13,7 @@ import logging
 import random
 
 def draw(run):
-    run = '/mnt/c/Users/malac/Stochastic_LISA/storage/tp_dur_lmax_pwr/' + run
+    run = '/home/vuk/mbloom/storage/tp_dur_lmax_pwr/' + run
     with open(run +'/config.pickle','rb') as paramfile:
         params = pickle.load(paramfile)
         inj = pickle.load(paramfile)
@@ -161,8 +161,7 @@ def getDistOverArea(run):
         #     r+=.01
         count+=1
         print(count)
-        if count==1000:
-            break
+
     print('100%')
 
     confidence68 = [np.quantile(vals, .16),np.quantile(vals, .84)]
@@ -171,7 +170,7 @@ def getDistOverArea(run):
 
     print(str(np.mean(vals)), "+", confidence95[1], "-", confidence95[0])
 
-    with open('/mnt/c/Users/malac/Stochastic_LISA/storage/tp_error_bars/DistOverArea_'+ run + '.txt','w') as f:
+    with open('/home/vuk/mbloom/storage/tp_dur_lmax_pwr/error_bars/DistOverArea_'+ run + '.txt','w') as f:
         f.write("b_lm median: " + str(median_blm_val) +  '\n')
         f.write("b_lm mean: " + str(mean_blm_val) +  '\n')
         f.write("distribution median: " + str(np.median(vals)) +  '\n')

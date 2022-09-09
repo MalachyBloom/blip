@@ -134,16 +134,16 @@ def getSignalBlob(Omega_median_map):
     return signalBlob, peak_val
 
 def getMapStatus(params, sample, parameters, inj):
-    skymap = list(quickMapmaker(params, sample, parameters, inj, 32))
-    signalBlob, peak_val = getSignalBlob(skymap)
+    skymap = list(quickMapmaker(params, sample, parameters, inj, 32)) #makes a map (a list where the index is location and the values are the energy density of the GW)
+    signalBlob, peak_val = getSignalBlob(skymap) # function gives all pixels inside FWHM and the peak Omega0 value
 
-    condition_1 = True
+    condition_1 = True # checks to see if there are any pixels outside of the FWHM that are > half the peak value
     for pxl_val in delete_multiple_element(skymap,list(signalBlob)):
-        if pxl_val > .5*peak_val:
+        if pxl_val > .5*peak_val: #you might want to change this line. maybe 10% or 20%?
             condition_1 = False
             break
     
-    condition_2 = False
+    condition_2 = False # checks that the injected location is inside the FWHM -- you'll probably want to remove this part
     if hp.pixelfunc.ang2pix(32,1.5708, -1.5708) in signalBlob:
         condition_2 = True
 
@@ -153,7 +153,7 @@ def getMapStatus(params, sample, parameters, inj):
         return False
 
 def getQuality(run):
-    params, post, parameters, inj = draw(run)
+    params, post, parameters, inj = draw(run) #grabs stuff from output files
 
     medianStatus = getMapStatus(params, np.median(post, axis=0), parameters, inj)
     meanStatus = getMapStatus(params, np.average(post, axis=0), parameters, inj)
@@ -163,22 +163,22 @@ def getQuality(run):
 
     count,good,r=0,0,0
     print("There are " ,len(post)," samples for this run")
-    for sample in post:
-        if getMapStatus(params, sample, parameters, inj):
+    for sample in post: # loops through all samples for a given run
+        if getMapStatus(params, sample, parameters, inj): #Does this sample satisfy the conditions
             good+=1
 
-        if count <= r*len(post) < count+1:
+        if count <= r*len(post) < count+1: #tracks progress
             print(str(int(r*100+.1)) + '%')
             r+=.01
         count+=1
 
-    recovery_quality = good/len(post)
+    recovery_quality = good/len(post) #a fraction of good maps over total maps
         # if 0.017 <= A <= 0.018:
         #     print(sample)
 
     print('100%')
     print(recovery_quality)
-
+    #write stuff to file
     with open('/mnt/c/Users/malac/Stochastic_LISA/storage/recovery_quality/FWxM_5e-1_'+ run + '.txt','w') as f:
         f.write("median: " + str(medianStatus) +  '\n')
         f.write("mean: " + str(meanStatus) +  '\n')
@@ -186,7 +186,7 @@ def getQuality(run):
 
 def main():
     runs = ['6mo_2_5e-8','6mo_2_6e-8','3mo_4_7e-8']
-    for run in runs:
+    for run in runs: #point to your output directories
         print()
         print(run)
         getQuality(run)

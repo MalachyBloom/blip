@@ -15,7 +15,7 @@ import random
 # matplotlib.rcParams.update(matplotlib.rcParamsDefault)
 
 def draw(run):
-    run = '/mnt/c/Users/malac/Stochastic_LISA/storage/dur_lmax_pwr/'+run
+    run = '/mnt/c/Users/malac/Stochastic_LISA/storage/sph_harm/'+run
     with open(run +'/config.pickle','rb') as paramfile:
         params = pickle.load(paramfile)
         inj = pickle.load(paramfile)
@@ -179,7 +179,7 @@ def getAreas(run):
     confidence90 = [np.quantile(areas, .05),np.quantile(areas, .95)] 
     confidence95 = [np.quantile(areas, .025),np.quantile(areas, .975)]
 
-    with open('/mnt/c/Users/malac/Stochastic_LISA/storage/error_bars/FWxM_5e-1_'+ run + '.txt','w') as f:
+    with open('/mnt/c/Users/malac/Stochastic_LISA/storage/error_bars_sph_harm/' + run + '.txt','w') as f:
         f.write("b_lm median: " + str(medianPointSize) +  '\n')
         f.write("b_lm mean: " + str(meanPointSize) +  '\n')
         f.write("distribution median: " + str(np.median(areas)) +  '\n')
@@ -190,7 +190,7 @@ def getAreas(run):
         f.write(str(areas))
 
 def main():
-    runs = ['3mo_2_5e-6','3mo_2_4e-6','3mo_2_3e-6','3mo_2_2e-6','3mo_2_1e-6','3mo_4_5e-6','3mo_4_4e-6','3mo_4_3e-6','3mo_4_2e-6','3mo_4_1e-6','6mo_2_5e-6','6mo_2_4e-6','6mo_2_3e-6','12mo_2_5e-6','12mo_2_4e-6','12mo_2_3e-6']
+    runs = ['params_3mo_2blmax_1e-6pwr_8inj']
     for run in runs:
         print()
         print(run)

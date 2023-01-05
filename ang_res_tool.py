@@ -100,7 +100,7 @@ def quickMapmaker(params, sample, parameters, inj, nside, saveto=None):
 
     Omega_median_map  =  Omega_1mHz_median * (1.0/norm) * (hp.alm2map(blm_median_vals, nside))**2
 
-    return Omega_median_map  
+    return Omega_median_map 
 
 def FWxM(skymap,x,ns):
     peak_value = max(skymap)
@@ -117,7 +117,52 @@ def FWxM(skymap,x,ns):
                 border = border.union(set(hp.pixelfunc.get_all_neighbours(ns,pxl_index))).difference(signalBlob)
                 count+=1
                 full = False       
-    return signalBlob, peak_value
+    return count/len(skymap)
+
+def getPointSize(params, sample, parameters, inj):
+    nside=32
+    Omega_median_map = quickMapmaker(params, sample, parameters, inj, nside)
+    pointSize = FWxM(Omega_median_map, .5, nside)
+    return pointSize
+
+def getAreas(run):
+    params, post, parameters, inj = draw(run)
+
+    medianPointSize = getPointSize(params, np.median(post, axis=0), parameters, inj)
+    meanPointSize = getPointSize(params, np.average(post, axis=0), parameters, inj)
+
+    random.shuffle(post)
+    areas=[]
+    count=0
+    r=0
+    print("There are " ,len(post)," samples for this run")
+    for sample in post:
+        A = getPointSize(params, sample, parameters, inj)
+        areas.append(A)
+        if count <= r*len(post) < count+1:
+            print(str(int(r*100+.1)) + '%')
+            r+=.01
+        count+=1
+        # if 0.017 <= A <= 0.018:
+        #     print(sample)
+
+    print('100%')
+
+    confidence68 = [np.quantile(areas, .16),np.quantile(areas, .84)]
+    confidence90 = [np.quantile(areas, .05),np.quantile(areas, .95)] 
+    confidence95 = [np.quantile(areas, .025),np.quantile(areas, .975)]
+
+    with open('/mnt/c/Users/malac/Stochastic_LISA/storage/error_bars_sph_harm/' + run + '.txt','w') as f:
+        f.write("b_lm median: " + str(medianPointSize) +  '\n')
+        f.write("b_lm mean: " + str(meanPointSize) +  '\n')
+        f.write("distribution median: " + str(np.median(areas)) +  '\n')
+        f.write("distribution mean: " + str(np.mean(areas)) +  '\n')
+        f.write("68'%' confidence interval: " + str(confidence68) +  '\n')
+        f.write("90'%' confidence interval: " + str(confidence90) + '\n')
+        f.write("95'%' confidence interval: " + str(confidence95) + '\n')
+        f.write(str(areas))
+
+##########################
 
 def delete_multiple_element(list_object, indices):
     indices = sorted(indices, reverse=True)
@@ -184,12 +229,16 @@ def getQuality(run):
         f.write("mean: " + str(meanStatus) +  '\n')
         f.write(str(recovery_quality))
 
+##########################
+
+
+
 def main():
     runs = ['params_3mo_2blmax_1e-6pwr_8inj']
-    for run in runs: #point to your output directories
+    for run in runs:
         print()
         print(run)
-        getQuality(run)
+        getAreas(run)  
 
 if __name__ == '__main__':
     main()

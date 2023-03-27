@@ -136,11 +136,14 @@ def tpMetric(params, sample, parameters, inj, nside=32,D=[]):
     pointSize_1, signalBlob_1, border_1 = FWxM(skymap,.5,nside)
     pointSize_2, signalBlob_2, border_2 = FWxM(skymap,.5,nside,signalBlob_1)
     ps = pointSize_1 + pointSize_2
-    for x in border_1:
-        for y in border_2:
-            d = getDist(x,y)
-            D.append(d)
-    dist = min(D)
+    if pointSize_2 ==0:
+        dist = 0
+    else:
+        for x in border_1:
+            for y in border_2:
+                d = getDist(x,y)
+                D.append(d)
+        dist = min(D)
     return dist/ps, border_1.union(border_2)
 
 def getDistOverArea(run):

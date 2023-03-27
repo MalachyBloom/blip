@@ -159,11 +159,11 @@ def getDistOverArea(run):
     for sample in post:
         val,b = tpMetric(params, sample, parameters, inj)
         vals.append(val)
-        # if count <= r*100 < count+1:
-        #     print(str(int(r*100+.1)) + '%')
-        #     r+=.01
+        if count <= r*100 < count+1:
+            print(str(int(r*100+.1)) + '%')
+            r+=.01
         count+=1
-        print(count)
+        # print(count)
 
     print('100%')
 
@@ -185,7 +185,7 @@ def getDistOverArea(run):
 
 def main():
     nside = 32
-    runs = ['tp_dur3_blmax2_pwr1e-7_sep8']
+    runs = ['tp_dur3_blmax2_pwr1e-7_sep2','tp_dur3_blmax2_pwr1e-7_sep4','tp_dur3_blmax2_pwr1e-7_sep6','tp_dur3_blmax2_pwr1e-7_sep8','tp_dur3_blmax2_pwr1e-7_sep10','tp_dur3_blmax2_pwr1e-7_sep2','tp_dur3_blmax2_pwr1e-7_sep4']
     for run in runs:
         print(run)
         getDistOverArea(run)

@@ -185,7 +185,7 @@ def getDistOverArea(run):
 
 def main():
     nside = 32
-    runs = ['tp_3mo_2_2e-7']
+    runs = ['tp_dur3_blmax2_pwr1e-7_sep8']
     for run in runs:
         print(run)
         getDistOverArea(run)

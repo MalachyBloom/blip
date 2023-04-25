@@ -89,7 +89,11 @@ def getDistOverArea(run,outdir=None,summary_filename='tp_localization_summary',F
 
 def main():
     nside = 32
-    runs = ['tp_dur3_blmax2_pwr1e-7_sep2/','tp_dur3_blmax2_pwr1e-7_sep4/','tp_dur3_blmax2_pwr1e-7_sep6/','tp_dur3_blmax2_pwr1e-7_sep8/','tp_dur3_blmax2_pwr1e-7_sep10/','tp_dur3_blmax2_pwr1e-7_sep2/','tp_dur3_blmax2_pwr1e-7_sep4/']
+    runs = ['tp_dur3_blmax2_pwr1e-7_sep2/','tp_dur3_blmax2_pwr1e-7_sep4/','tp_dur3_blmax2_pwr1e-7_sep6/','tp_dur3_blmax2_pwr1e-7_sep8/','tp_dur3_blmax2_pwr1e-7_sep10/',
+    'tp_dur3_blmax3_pwr1e-7_sep2/','tp_dur3_blmax3_pwr1e-7_sep4/','tp_dur3_blmax3_pwr1e-7_sep6/','tp_dur3_blmax3_pwr1e-7_sep8/','tp_dur3_blmax3_pwr1e-7_sep10/',
+    'tp_dur3_blmax4_pwr1e-7_sep2/','tp_dur3_blmax4_pwr1e-7_sep4/','tp_dur3_blmax4_pwr1e-7_sep6/','tp_dur3_blmax4_pwr1e-7_sep8/','tp_dur3_blmax4_pwr1e-7_sep10/',
+    'tp_dur3_blmax5_pwr1e-7_sep2/','tp_dur3_blmax5_pwr1e-7_sep4/','tp_dur3_blmax5_pwr1e-7_sep6/','tp_dur3_blmax5_pwr1e-7_sep8/','tp_dur3_blmax5_pwr1e-7_sep10/'
+    ]
     pathto = '/home/vuk/mbloom/storage/tp_dur_lmax_pwr/'
     for run in runs:
         print(run)

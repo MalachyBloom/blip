@@ -11,7 +11,7 @@ from astropy import units as u
 import pickle, argparse
 import logging
 import random
-from localization import quickMapmaker, FWxM, getAngRes, FWxM_contour, getLocalizationSummary,loadRunDir
+from tools.localization import quickMapmaker, FWxM, getAngRes, FWxM_contour, getLocalizationSummary,loadRunDir
 
 def getDist(x,y,nside=32):
     th1,ph1 = hp.pixelfunc.pix2ang(nside,x)

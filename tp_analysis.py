@@ -24,7 +24,7 @@ def tpMetric(params, sample, parameters, inj, nside=32,D=[]):
     pointSize_1, signalBlob_1, peak_value_1, border_1 = FWxM(skymap,fracMax=.5,nside=nside)
     pointSize_2, signalBlob_2, peak_value_2, border_2 = FWxM(skymap,fracMax=.5,nside=nside,ommission=signalBlob_1)
     ps = pointSize_1 + pointSize_2
-    if pointSize_2 ==0:
+    if signalBlob_1.difference(signalBlob_2) == set():
         dist = 0
     else:
         for x in border_1:
@@ -32,6 +32,7 @@ def tpMetric(params, sample, parameters, inj, nside=32,D=[]):
                 d = getDist(x,y)
                 D.append(d)
         dist = min(D)
+    print(dist/ps)
     return dist/ps, border_1.union(border_2)
 
 def getDistOverArea(run,outdir=None,summary_filename='tp_localization_summary',FWxM_filename='tp_val_list'):
@@ -49,11 +50,11 @@ def getDistOverArea(run,outdir=None,summary_filename='tp_localization_summary',F
     for sample in post:
         val,b = tpMetric(params, sample, parameters, inj)
         vals.append(val)
-        if count <= r*100 < count+1:
-            print(str(int(r*100+.1)) + '%')
-            r+=.01
+        # if count <= r*100 < count+1:
+        #     print(str(int(r*100+.1)) + '%')
+        #     r+=.01
         count+=1
-        # print(count)
+        print(count)
 
     print('100%')
 
@@ -72,7 +73,7 @@ def getDistOverArea(run,outdir=None,summary_filename='tp_localization_summary',F
     #     f.write("90'%' confidence interval: " + str(confidence90) + '\n')
     #     f.write("95'%' confidence interval: " + str(confidence95) + '\n')
     #     f.write(str(vals))
-
+    print('writing files')
     with open(outdir + summary_filename + '.txt','w') as f:
         f.write("distribution mean: " + str(np.mean(vals)) +  '\n')
         f.write("95'%' confidence interval: " + str(confidence95) + '\n')
@@ -87,17 +88,31 @@ def getDistOverArea(run,outdir=None,summary_filename='tp_localization_summary',F
     with open(outdir + FWxM_filename + '.txt','w') as f:
         f.write(str(vals))
 
-def main():
-    nside = 32
-    runs = ['tp_dur3_blmax2_pwr1e-7_sep2/','tp_dur3_blmax2_pwr1e-7_sep4/','tp_dur3_blmax2_pwr1e-7_sep6/','tp_dur3_blmax2_pwr1e-7_sep8/','tp_dur3_blmax2_pwr1e-7_sep10/',
-    'tp_dur3_blmax3_pwr1e-7_sep2/','tp_dur3_blmax3_pwr1e-7_sep4/','tp_dur3_blmax3_pwr1e-7_sep6/','tp_dur3_blmax3_pwr1e-7_sep8/','tp_dur3_blmax3_pwr1e-7_sep10/',
-    'tp_dur3_blmax4_pwr1e-7_sep2/','tp_dur3_blmax4_pwr1e-7_sep4/','tp_dur3_blmax4_pwr1e-7_sep6/','tp_dur3_blmax4_pwr1e-7_sep8/','tp_dur3_blmax4_pwr1e-7_sep10/',
-    'tp_dur3_blmax5_pwr1e-7_sep2/','tp_dur3_blmax5_pwr1e-7_sep4/','tp_dur3_blmax5_pwr1e-7_sep6/','tp_dur3_blmax5_pwr1e-7_sep8/','tp_dur3_blmax5_pwr1e-7_sep10/'
-    ]
-    pathto = '/home/vuk/mbloom/storage/tp_dur_lmax_pwr/'
-    for run in runs:
-        print(run)
-        getDistOverArea(pathto + run,outdir='/home/vuk/mbloom/storage/tp_dur_lmax_pwr/error_bars/',summary_filename=run,FWxM_filename='full'+run)
+# def main():
+#     nside = 32
+#     runs = ['tp_dur3_blmax2_pwr1e-7_sep2/','tp_dur3_blmax2_pwr1e-7_sep4/','tp_dur3_blmax2_pwr1e-7_sep6/','tp_dur3_blmax2_pwr1e-7_sep8/','tp_dur3_blmax2_pwr1e-7_sep10/',
+#     'tp_dur3_blmax3_pwr1e-7_sep2/','tp_dur3_blmax3_pwr1e-7_sep4/','tp_dur3_blmax3_pwr1e-7_sep6/','tp_dur3_blmax3_pwr1e-7_sep8/','tp_dur3_blmax3_pwr1e-7_sep10/',
+#     'tp_dur3_blmax4_pwr1e-7_sep2/','tp_dur3_blmax4_pwr1e-7_sep4/','tp_dur3_blmax4_pwr1e-7_sep6/','tp_dur3_blmax4_pwr1e-7_sep8/','tp_dur3_blmax4_pwr1e-7_sep10/',
+#     'tp_dur3_blmax5_pwr1e-7_sep2/','tp_dur3_blmax5_pwr1e-7_sep4/','tp_dur3_blmax5_pwr1e-7_sep6/','tp_dur3_blmax5_pwr1e-7_sep8/','tp_dur3_blmax5_pwr1e-7_sep10/'
+#     ]
+#     pathto = '/home/vuk/mbloom/storage/tp_dur_lmax_pwr/'
+#     for run in runs:
+#         print(run)
+#         getDistOverArea(pathto + run,outdir='/home/vuk/mbloom/storage/tp_dur_lmax_pwr/error_bars/',summary_filename=run,FWxM_filename='full'+run)
     
 if __name__ == '__main__':
-    main()
+
+    # Create parser
+    parser = argparse.ArgumentParser(prog='getDistOverArea', usage='%(prog)s [options] rundir', description='run getDistOverArea')
+
+    # Add arguments
+    parser.add_argument('rundir', metavar='rundir', type=str, help='The path to the run directory')
+
+    parser.add_argument('-o','--outdir', default=None, type=str, help='The path to the out directory')
+
+    parser.add_argument('--fname', default=None, type=str, help='The names to the out directory')
+
+    # execute parser
+    args = parser.parse_args()
+    
+    getDistOverArea(args.rundir,outdir=args.outfir,FWxM_filename=args.fname +'tp_val_list',summary_filename=args.fname +'tp_localization_summary' )

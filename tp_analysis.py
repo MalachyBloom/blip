@@ -43,6 +43,8 @@ def getDistOverArea(run,outdir=None,summary_filename='tp_localization_summary',F
     print('beginning analysis to be written in ' + str(outdir))
     median_blm_val,b1 = tpMetric(params, np.median(post, axis=0), parameters, inj)
     mean_blm_val,b2 = tpMetric(params, np.average(post, axis=0), parameters, inj)
+    print('printing skymap')
+    FWxM_contour(quickMapmaker(params, np.median(post, axis=0), parameters, inj, 32),plotTitle='Median blm Localization Skymap',outdir=outdir,filename='mediuan_blm_localization_skymap')
     print(len(post),median_blm_val)
 
     random.shuffle(post)

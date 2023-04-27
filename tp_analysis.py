@@ -115,4 +115,4 @@ if __name__ == '__main__':
     # execute parser
     args = parser.parse_args()
     
-    getDistOverArea(args.rundir,outdir=args.outfir,FWxM_filename=args.fname +'tp_val_list',summary_filename=args.fname +'tp_localization_summary' )
+    getDistOverArea(args.rundir,outdir=args.outdir,FWxM_filename=args.fname +'tp_val_list',summary_filename=args.fname +'tp_localization_summary' )

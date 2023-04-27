@@ -118,5 +118,5 @@ if __name__ == '__main__':
     args = parser.parse_args()
     print('printing skymap')
     params, post, parameters, inj = loadRunDir(args.rundir)
-    FWxM_contour(quickMapmaker(params, np.median(post, axis=0), parameters, inj, 32),plotTitle='Median blm Localization Skymap',outdir=outdir,filename=args.fname+'mediuan_blm_localization_skymap')
+    FWxM_contour(quickMapmaker(params, np.median(post, axis=0), parameters, inj, 32),plotTitle='Median blm Localization Skymap',outdir=args.outdir,filename=args.fname+'mediuan_blm_localization_skymap')
     getDistOverArea(args.rundir,outdir=args.outdir,FWxM_filename=args.fname +'tp_val_list',summary_filename=args.fname +'tp_localization_summary' )

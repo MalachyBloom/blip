@@ -24,7 +24,7 @@ def tpMetric(params, sample, parameters, inj, nside=32,D=[]):
     pointSize_1, signalBlob_1, peak_value_1, border_1 = FWxM(skymap,fracMax=.5,nside=nside)
     pointSize_2, signalBlob_2, peak_value_2, border_2 = FWxM(skymap,fracMax=.5,nside=nside,ommission=signalBlob_1)
     ps = pointSize_1 + pointSize_2
-    if signalBlob_1.difference(signalBlob_2) == set():
+    if signalBlob_1.difference(signalBlob_2) == set() or ps==0:
         dist = 0
     else:
         for x in border_1:
@@ -44,7 +44,7 @@ def getDistOverArea(run,outdir=None,summary_filename='tp_localization_summary',F
     median_blm_val,b1 = tpMetric(params, np.median(post, axis=0), parameters, inj)
     mean_blm_val,b2 = tpMetric(params, np.average(post, axis=0), parameters, inj)
 
-    print(len(post),median_blm_val)
+    print('there are '+ int(len(post)) +' samples and the median dist/ps is ' + int(median_blm_val))
 
     random.shuffle(post)
     vals = []

@@ -51,8 +51,8 @@ def getDistOverArea(run,outdir=None,summary_filename='tp_localization_summary',F
     for sample in post:
         val,b = tpMetric(params, sample, parameters, inj)
         vals.append(val)
-        if count%int(.01*len(post))==0:
-            print(str(count/len(post)) + '%')
+        if count%int(.01*len(post))==1:
+            print(str(100*count/len(post)) + '%')
             r+=.01
         count+=1
         # print(count)

@@ -32,7 +32,7 @@ def tpMetric(params, sample, parameters, inj, nside=32,D=[]):
                 d = getDist(x,y)
                 D.append(d)
         dist = min(D)
-    print(dist/ps)
+    # print(dist/ps)
     return dist/ps, border_1.union(border_2)
 
 def getDistOverArea(run,outdir=None,summary_filename='tp_localization_summary',FWxM_filename='tp_val_list'):
@@ -40,6 +40,7 @@ def getDistOverArea(run,outdir=None,summary_filename='tp_localization_summary',F
         outdir = run
     params, post, parameters, inj = loadRunDir(run)
 
+    print('beginning analysis to be written in ' + str(outdir))
     median_blm_val,b1 = tpMetric(params, np.median(post, axis=0), parameters, inj)
     mean_blm_val,b2 = tpMetric(params, np.average(post, axis=0), parameters, inj)
     print(len(post),median_blm_val)
@@ -50,11 +51,11 @@ def getDistOverArea(run,outdir=None,summary_filename='tp_localization_summary',F
     for sample in post:
         val,b = tpMetric(params, sample, parameters, inj)
         vals.append(val)
-        # if count <= r*100 < count+1:
-        #     print(str(int(r*100+.1)) + '%')
-        #     r+=.01
+        if count%int(.01*len(post))==0:
+            print(str(count/len(post)) + '%')
+            r+=.01
         count+=1
-        print(count)
+        # print(count)
 
     print('100%')
 

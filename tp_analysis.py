@@ -22,7 +22,7 @@ def getDist(x,y,nside=32):
 def tpMetric(params, sample, parameters, inj, nside=32,D=[]):
     skymap = quickMapmaker(params, sample, parameters, inj, nside)
     pointSize_1, signalBlob_1, peak_value_1, border_1 = FWxM(skymap,fracMax=.5,nside=nside)
-    pointSize_2, signalBlob_2, peak_value_2, border_2 = FWxM(skymap,fracMax=.5,nside=nside,ommission=signalBlob_1)
+    pointSize_2, signalBlob_2, peak_value_2, border_2 = FWxM(skymap,fracMax=.5,nside=nside,ommission=signalBlob_1,global_peak_val=max(delete_multiple_element(list(skymap),list(signalBlob_1))))
     ps = pointSize_1 + pointSize_2
     if signalBlob_1.difference(signalBlob_2) == set() or ps==0:
         dist = 0

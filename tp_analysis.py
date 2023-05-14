@@ -44,7 +44,7 @@ def getDistOverArea(run,outdir=None,summary_filename='tp_localization_summary',F
     median_blm_val,b1 = tpMetric(params, np.median(post, axis=0), parameters, inj)
     mean_blm_val,b2 = tpMetric(params, np.average(post, axis=0), parameters, inj)
 
-    print('there are '+ int(len(post)) +' samples and the median dist/ps is ' + int(median_blm_val))
+    print('there are '+ str(int(len(post))) +' samples and the median dist/ps is ' + str(int(median_blm_val)))
 
     random.shuffle(post)
     vals = []

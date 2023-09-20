@@ -22,7 +22,7 @@ def loadRunDir(rundir):
 def quickMapmaker(params, sample, parameters, inj, nside=32, saveto=None):
     
     if type(parameters) is dict:
-        blm_start = len(parameters['noise']) + len(parameters['signal'])
+        # blm_start = len(parameters['noise']) + len(parameters['signal'])
         ## deal with extra parameter in broken_powerlaw:
 
         # if 'spectrum_model' in params.keys():

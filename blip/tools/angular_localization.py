@@ -24,9 +24,11 @@ def quickMapmaker(params, sample, parameters, inj, nside=32, saveto=None):
     if type(parameters) is dict:
         blm_start = len(parameters['noise']) + len(parameters['signal'])
         ## deal with extra parameter in broken_powerlaw:
-        if 'spectrum_model' in params.keys():
-            if params['spectrum_model']=='broken_powerlaw':
-                blm_start = blm_start - 1
+
+        # if 'spectrum_model' in params.keys():
+        #     if params['spectrum_model']=='broken_powerlaw':
+        #         blm_start = blm_start - 1
+        blm_start = 4
         
     elif type(parameters) is list:
         print("Warning: using a depreciated parameter format. Number of non-b_lm parameters is unknown, defaulting to n=4.")
